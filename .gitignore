@@ -1,0 +1,52 @@
+ # Dependency directories
+node_modules/
+.pnpm/
+.yarn/
+dist/
+build/
+
+# Production build
+out/
+
+# Environment variables
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS/system files
+.DS_Store
+Thumbs.db
+
+# IDE configs
+.vscode/
+.idea/
+*.swp
+
+# Testing
+coverage/
+*.lcov
+
+# Cache / Temp files
+.cache/
+.next/
+turbo/
+*.log
+*.tmp
+*.pid
+
+# Lint and TypeScript
+.eslintcache
+*.tsbuildinfo
+
+# Misc
+*.local
+*.bak
