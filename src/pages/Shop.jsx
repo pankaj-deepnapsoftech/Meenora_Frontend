@@ -48,6 +48,7 @@ const Shop = () => {
     slug: name.toLowerCase().replace(/\s+/g, '-'),
   }));
 
+
   const filteredProducts = useMemo(() => {
     let filtered = productData || [];
 
@@ -163,6 +164,20 @@ const Shop = () => {
                       Categories
                     </h3>
                     <div className="space-y-2.5">
+                      <button
+                        onClick={() => {
+                          setSelectedCategory('all');
+                          if (showFilters) setShowFilters(false);
+                        }}
+                        className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 text-base ${selectedCategory === 'all'
+                          ? 'bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/90'
+                          : 'text-muted-foreground hover:bg-primary/10 hover:text-primary font-medium'
+                          }`}
+                      >
+                        All Products
+                      </button>
+
+
                       {shopCategories.map((category) => (
                         <button
                           key={category.slug}
@@ -171,14 +186,15 @@ const Shop = () => {
                             if (showFilters) setShowFilters(false);
                           }}
                           className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 text-base ${selectedCategory === category.slug
-                              ? 'bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/90'
-                              : 'text-muted-foreground hover:bg-primary/10 hover:text-primary font-medium'
+                            ? 'bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/90'
+                            : 'text-muted-foreground hover:bg-primary/10 hover:text-primary font-medium'
                             }`}
                         >
                           {category.name}
                         </button>
                       ))}
                     </div>
+
                   </div>
 
 
@@ -205,6 +221,7 @@ const Shop = () => {
             {/* Product List */}
             <main className="flex-1">
               <div className="flex items-center justify-between mb-8">
+
                 <div className="flex items-center space-x-4">
                   <Button
                     variant="outline"
@@ -246,7 +263,7 @@ const Shop = () => {
                   <p className="text-muted-foreground/80 text-lg">Try adjusting your filters or search terms to uncover hidden gems.</p>
                 </div>
               ) : (
-                <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-6'}>
+                <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6' : 'space-y-6'}>
                   {filteredProducts.map((product, index) => (
                     <motion.div
                       key={product._id}

@@ -57,7 +57,7 @@ const Navbar = () => {
   const navItemsEnd = [
     { name: 'About Us', path: '/about' },
     { name: 'Contact Us', path: '/contact' },
-    { name: 'Blog', path: '/blog', onClick: () => toast({ description: "🚧 Blog feature isn't implemented yet—but don't worry! You can request it in your next prompt! 🚀" }) }
+    { name: 'Blog', path: '/blog'}
   ];
   
   const renderComingSoonDropdown = () => (

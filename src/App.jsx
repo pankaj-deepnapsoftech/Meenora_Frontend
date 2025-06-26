@@ -27,6 +27,7 @@ import { WishlistProvider } from '@/contexts/WishlistContext';
 import AdminProductContextProvider from './contexts/AdminProductContext';
 import ContactProvider from './contexts/ContactContext';
 import AdminBlogProvider from './contexts/AdminBlogContext';
+import Blog from './pages/Blog';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAdmin, isLoading } = useAuth();
@@ -69,6 +70,7 @@ const AppLayout = () => {
           <Route path="/shop" element={<Shop />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/blog" element={<Blog />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -117,7 +119,6 @@ function App() {
           <AdminProductContextProvider>
             <ContactProvider>
               <AdminBlogProvider>
-
                 <Router>
                   <AppLayout />
                 </Router>

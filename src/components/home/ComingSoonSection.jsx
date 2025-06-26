@@ -3,18 +3,21 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { products as allProducts } from '@/data/products'; 
+// import { products as allProducts } from '@/data/products'; 
 import { Sparkles, Bell } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { useAdminProductContext } from '../../contexts/AdminProductContext';
 
 const ComingSoonSection = () => {
-  const sunscreen = allProducts.find(p => p.name.toLowerCase().includes('sunscreen') && p.comingSoon);
-  const moisturiser = allProducts.find(p => p.name.toLowerCase().includes('moisturiser') && p.comingSoon);
-  const faceWash = allProducts.find(p => p.name.toLowerCase().includes('face wash') && p.comingSoon);
+ 
+  const { productData } =  useAdminProductContext()
+  const sunscreen = productData?.find(p => p.name.toLowerCase().includes('sunscreen') && p.status === "comingSoon");
+  const moisturiser = productData?.find(p => p.name.toLowerCase().includes('moisturiser') && p.status === "comingSoon");
+  const faceWash = productData?.find(p => p.name.toLowerCase().includes('face wash') && p.status === "comingSoon");
 
   const comingSoonProducts = [sunscreen, moisturiser, faceWash].filter(Boolean);
 
-  if (comingSoonProducts.length === 0) return null;
+  if (comingSoonProducts.length === 0) return <div>no data found</div>;
 
   return (
     <section id="coming-soon" className="py-20 lg:py-28 bg-secondary/10">
@@ -38,7 +41,7 @@ const ComingSoonSection = () => {
         <div className="product-grid">
           {comingSoonProducts.map((product, index) => (
             <motion.div
-              key={product.id}
+              key={product._id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -49,7 +52,7 @@ const ComingSoonSection = () => {
                   <img 
                     className="w-full h-80 object-cover opacity-90 group-hover:opacity-75 transition-opacity duration-500 ease-in-out"
                     alt={product.name + " - Meenora coming soon product bottle"}
-                   src="https://images.unsplash.com/photo-1695561115667-c2e975c7cf22" />
+                   src={product.image} />
                   <Badge className="absolute top-4 left-4 coming-soon-badge px-3 py-1.5 text-xs shadow-md font-semibold tracking-wide">
                     Coming Soon
                   </Badge>
@@ -70,7 +73,7 @@ const ComingSoonSection = () => {
                     {product.name.toLowerCase().includes('face wash') && <li className="flex items-center"><Sparkles className="h-3 w-3 mr-1.5 text-accent" /> Clean, calm, and refresh without harsh chemicals</li>}
                   </ul>
                   <div className="flex items-center justify-between pt-2 mt-auto">
-                     <span className="text-2xl font-display font-semibold text-primary">${product.price.toFixed(2)}</span>
+                    <span className="text-2xl font-display font-semibold text-primary">₹{product.price.toFixed(2)}</span>
                     <Button 
                       variant="outline"
                       className="border-accent text-accent hover:bg-accent hover:text-white font-semibold"

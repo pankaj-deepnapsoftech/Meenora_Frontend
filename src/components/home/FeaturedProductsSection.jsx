@@ -5,16 +5,17 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { products } from '@/data/products'; // Using all products to find shampoo & conditioner
 import { useCart } from '@/contexts/CartContext';
 import { toast } from '@/components/ui/use-toast';
 import { ShoppingCart, Eye, ArrowRight, Heart } from 'lucide-react';
+import { useAdminProductContext } from '../../contexts/AdminProductContext';
 
 const FeaturedProductsSection = () => {
   const { addToCart } = useCart();
+  const { productData }  =  useAdminProductContext()
   // Find Shampoo and Conditioner specifically
-  const shampoo = products.find(p => p.name.toLowerCase().includes('shampoo') && p.category === 'Hair Care' && !p.comingSoon);
-  const conditioner = products.find(p => p.name.toLowerCase().includes('conditioner') && p.category === 'Hair Care' && !p.comingSoon);
+  const shampoo = productData.find(p => p.name.toLowerCase().includes('shampoo') && p.category === 'Hair Care' && !p.comingSoon);
+  const conditioner = productData .find(p => p.name.toLowerCase().includes('conditioner') && p.category === 'Hair Care' && !p.comingSoon);
   
   const hairCareEssentials = [shampoo, conditioner].filter(Boolean); // Filter out undefined if not found
 
@@ -38,7 +39,7 @@ const FeaturedProductsSection = () => {
         </section>
     );
   }
-
+//  console.log(productData)
   return (
     <section className="py-20 lg:py-28 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -60,7 +61,7 @@ const FeaturedProductsSection = () => {
         <div className="product-grid">
           {hairCareEssentials.map((product, index) => (
             <motion.div
-              key={product.id}
+              key={product._id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -70,7 +71,7 @@ const FeaturedProductsSection = () => {
                 <div className="relative">
                   <Link to={`/product/${product.id}`} className="block">
                     <img 
-                      src={product.id === 1 ? "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/fc0aadef6556030140ba44161c44ce87.webp" : placeholderImage}
+                      src={product.image ? product.image : placeholderImage}
                       className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
                       alt={product.name + " - Meenora hair care essential"}
                      />
