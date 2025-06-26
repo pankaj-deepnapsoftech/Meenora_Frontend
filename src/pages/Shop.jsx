@@ -1,18 +1,20 @@
-
 import React, { useState, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Filter, Search, Grid, List, X, ShoppingCart, Eye, Star, Heart } from 'lucide-react';
+import {
+  Filter, Search, Grid, List, X, ShoppingCart, Star, Heart
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { products, categories } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from '@/components/ui/use-toast';
+import { useAdminProductContext } from '../contexts/AdminProductContext';
 
 const Shop = () => {
+  const { productData } = useAdminProductContext();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialCategory = queryParams.get('category') || 'all';
@@ -25,21 +27,41 @@ const Shop = () => {
   const { addToCart } = useCart();
   const placeholderImage = "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/ff29976cca7dcad09825798e79b09247.webp";
 
+  // Extract unique categories
+  const allCategories = Array.from(
+    new Set(productData?.map((p) => p.category).filter(Boolean))
+  );
+
+  const preferredCategories = ["Hair Growth", "Hair Damage", "Hair Styling", "Curl Care"];
+
+  const dynamicCategories = Array.from(
+    new Set(productData?.map((p) => p.category).filter(Boolean))
+  );
+
+  const allDisplayCategories = Array.from(new Set([
+    ...preferredCategories,
+    ...dynamicCategories
+  ]));
+
+  const shopCategories = allDisplayCategories.map((name) => ({
+    name,
+    slug: name.toLowerCase().replace(/\s+/g, '-'),
+  }));
 
   const filteredProducts = useMemo(() => {
-    let filtered = products;
+    let filtered = productData || [];
 
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(product => 
-        product.category.toLowerCase().replace(' ', '-') === selectedCategory ||
-        product.concern?.toLowerCase().replace(' ', '-') === selectedCategory
+      filtered = filtered.filter(product =>
+        product.category?.toLowerCase().replace(/\s+/g, '-') === selectedCategory ||
+        product.concern?.toLowerCase().replace(/\s+/g, '-') === selectedCategory
       );
     }
 
     if (searchTerm) {
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase())
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -56,7 +78,7 @@ const Shop = () => {
     });
 
     return filtered;
-  }, [searchTerm, selectedCategory, sortBy]);
+  }, [searchTerm, selectedCategory, sortBy, productData]);
 
   const handleAddToCart = (product) => {
     if (!product.inStock) {
@@ -67,15 +89,13 @@ const Shop = () => {
       });
       return;
     }
-    
+
     addToCart(product);
     toast({
       title: "Added to Cart!",
       description: `${product.name} has been added to your cart.`
     });
   };
-
-  const shopCategories = categories.filter(c => !["Hair Growth", "Hair Damage", "Hair Styling", "Curl Care"].includes(c.name));
 
   return (
     <>
@@ -119,6 +139,7 @@ const Shop = () => {
                   </Button>
                 )}
                 <div className="space-y-8">
+                  {/* Search */}
                   <div>
                     <label htmlFor="search-products" className="text-lg font-display text-foreground mb-3 block">
                       Find Your Product
@@ -136,6 +157,7 @@ const Shop = () => {
                     </div>
                   </div>
 
+                  {/* Categories */}
                   <div>
                     <h3 className="text-lg font-display text-foreground mb-3 block">
                       Categories
@@ -143,13 +165,15 @@ const Shop = () => {
                     <div className="space-y-2.5">
                       {shopCategories.map((category) => (
                         <button
-                          key={category.id}
-                          onClick={() => { setSelectedCategory(category.slug); if(showFilters) setShowFilters(false); }}
-                          className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 text-base ${
-                            selectedCategory === category.slug
+                          key={category.slug}
+                          onClick={() => {
+                            setSelectedCategory(category.slug);
+                            if (showFilters) setShowFilters(false);
+                          }}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 text-base ${selectedCategory === category.slug
                               ? 'bg-primary text-primary-foreground font-semibold shadow-md hover:bg-primary/90'
                               : 'text-muted-foreground hover:bg-primary/10 hover:text-primary font-medium'
-                          }`}
+                            }`}
                         >
                           {category.name}
                         </button>
@@ -157,6 +181,8 @@ const Shop = () => {
                     </div>
                   </div>
 
+
+                  {/* Sort By */}
                   <div>
                     <label htmlFor="sort-by" className="text-lg font-display text-foreground mb-3 block">
                       Sort By
@@ -176,7 +202,7 @@ const Shop = () => {
               </Card>
             </aside>
 
-            {/* Products */}
+            {/* Product List */}
             <main className="flex-1">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-4">
@@ -199,8 +225,6 @@ const Shop = () => {
                     variant={viewMode === 'grid' ? 'default' : 'outline'}
                     size="icon"
                     onClick={() => setViewMode('grid')}
-                    className={`${viewMode === 'grid' ? 'btn-primary' : 'border-primary text-primary hover:bg-primary/10'}`}
-                    aria-label="Grid view"
                   >
                     <Grid className="h-5 w-5" />
                   </Button>
@@ -208,14 +232,13 @@ const Shop = () => {
                     variant={viewMode === 'list' ? 'default' : 'outline'}
                     size="icon"
                     onClick={() => setViewMode('list')}
-                    className={`${viewMode === 'list' ? 'btn-primary' : 'border-primary text-primary hover:bg-primary/10'}`}
-                    aria-label="List view"
                   >
                     <List className="h-5 w-5" />
                   </Button>
                 </div>
               </div>
 
+              {/* No products */}
               {filteredProducts.length === 0 ? (
                 <div className="text-center py-20">
                   <Search className="h-20 w-20 text-muted-foreground/40 mx-auto mb-8" />
@@ -223,72 +246,64 @@ const Shop = () => {
                   <p className="text-muted-foreground/80 text-lg">Try adjusting your filters or search terms to uncover hidden gems.</p>
                 </div>
               ) : (
-                <div className={viewMode === 'grid' ? 'product-grid' : 'space-y-6'}>
+                <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-6'}>
                   {filteredProducts.map((product, index) => (
                     <motion.div
-                      key={product.id}
+                      key={product._id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.05 }}
                     >
-                       <Card className={`card-hover bg-card shadow-lg hover:shadow-primary/20 overflow-hidden group flex flex-col h-full ${
-                        viewMode === 'list' ? 'sm:flex-row' : ''
-                      }`}>
+                      <Card className={`card-hover bg-card shadow-lg hover:shadow-primary/20 overflow-hidden group flex flex-col h-full ${viewMode === 'list' ? 'sm:flex-row' : ''}`}>
                         <div className={`relative ${viewMode === 'list' ? 'sm:w-60 flex-shrink-0' : ''}`}>
-                          <Link to={`/product/${product.id}`} className="block">
-                            <img 
-                              src={product.id === 1 ? "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/fc0aadef6556030140ba44161c44ce87.webp" : placeholderImage}
-                              className={`object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out ${
-                                viewMode === 'list' ? 'w-full h-full sm:h-60' : 'w-full h-80'
-                              }`}
-                              alt={product.name + " - Meenora product"}
-                             />
-                          </Link>
+                          <NavLink to={`/products/${product._id}`}>
+                            <img
+                              src={product.image || placeholderImage}
+                              alt={product.name}
+                              className={`object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out ${viewMode === 'list' ? 'w-full h-full sm:h-60' : 'w-full h-80'}`}
+                            />
+                          </NavLink>
                           <div className="absolute top-4 left-4 space-y-2">
                             {product.tags?.includes("Bestseller") && (
-                              <Badge className="bg-primary text-primary-foreground px-3 py-1 text-xs shadow-sm font-semibold tracking-wide">Bestseller</Badge>
+                              <Badge className="bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold tracking-wide">Bestseller</Badge>
                             )}
-                             {product.comingSoon && (
-                              <Badge className="coming-soon-badge px-3 py-1 text-xs shadow-sm font-semibold tracking-wide">Coming Soon</Badge>
+                            {product.status === "comingSoon" && (
+                              <Badge className="bg-yellow-500 text-white px-3 py-1 text-xs font-semibold tracking-wide">Coming Soon</Badge>
                             )}
-                            {!product.inStock && !product.comingSoon && (
-                              <Badge variant="destructive" className="px-3 py-1 text-xs shadow-sm font-semibold tracking-wide">Out of Stock</Badge>
+                            {!product.status === "inStock" && !product.status === "comingSoon" && (
+                              <Badge variant="destructive" className="px-3 py-1 text-xs font-semibold tracking-wide">Out of Stock</Badge>
                             )}
                           </div>
-                           <div className="absolute top-4 right-4">
-                              <Button variant="outline" size="icon" className="bg-card/80 hover:bg-card border-border text-secondary hover:text-primary backdrop-blur-sm">
-                                <Heart className="h-5 w-5" />
-                              </Button>
-                           </div>
+                          <div className="absolute top-4 right-4">
+                            <Button variant="outline" size="icon" className="bg-card/80 border-border backdrop-blur-sm">
+                              <Heart className="h-5 w-5" />
+                            </Button>
+                          </div>
                         </div>
-                        
+
                         <CardContent className={`p-5 flex flex-col flex-grow ${viewMode === 'list' ? 'flex-1 space-y-2' : 'space-y-3'}`}>
-                          <div>
-                            <h3 className="text-xl font-display text-foreground mb-1 group-hover:text-primary transition-colors" title={product.name}>
-                              <Link to={`/product/${product.id}`}>{product.name}</Link>
-                            </h3>
-                            <p className="text-muted-foreground text-sm mb-2 line-clamp-2 h-10">
-                              {product.description}
-                            </p>
-                            <div className="flex items-center space-x-1 text-primary mb-2">
-                              {[...Array(5)].map((_, i) => (
-                                <Star key={i} className={`h-4 w-4 ${i < 4 ? 'fill-current' : 'text-muted-foreground/30'}`} />
-                              ))}
-                               <span className="text-xs text-muted-foreground ml-1">(150+)</span>
-                            </div>
+                          <h3 className="text-xl font-display text-foreground group-hover:text-primary transition-colors">
+                            <NavLink to={`/products/${product._id}`}>{product.name}</NavLink>
+                          </h3>
+                          <p className="text-muted-foreground text-sm line-clamp-2">
+                            {product.description}
+                          </p>
+                          <div className="flex items-center space-x-1 text-primary">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={`h-4 w-4 ${i < 4 ? 'fill-current' : 'text-muted-foreground/30'}`} />
+                            ))}
+                            <span className="text-xs text-muted-foreground ml-1">(150+)</span>
                           </div>
-                          
-                          <div className="flex items-center justify-between mt-auto pt-2">
-                            <span className="text-2xl font-display font-semibold text-primary">
-                              ${product.price.toFixed(2)}
-                            </span>
-                            <Button 
-                              size="default" 
-                              className="btn-primary group/btn"
+                          <div className="  items-center justify-between mt-auto pt-2">
+                            <p className="text-2xl  font-display font-semibold text-primary">
+                              ${product.price?.toFixed(2)}
+                            </p>
+                            <Button
                               onClick={() => handleAddToCart(product)}
-                              disabled={!product.inStock}
+                              disabled={product.status["inStock"]}
+                              className="btn-primary flex justify-center w-full"
                             >
-                              <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:animate-pulse" />
+                              <ShoppingCart className="h-4 w-4 mr-2" />
                               Add to Cart
                             </Button>
                           </div>

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
-import { BarChart3, Package, Users, ShoppingCart, Image as ImageIcon, Edit as EditIcon } from 'lucide-react';
+import { BarChart3, Package, Users, ShoppingCart, Image as ImageIcon, Edit as EditIcon, Mails } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminSidebar from '@/components/admin/AdminSidebar.jsx';
 import AdminDashboardTab from '@/components/admin/AdminDashboardTab.jsx';
@@ -13,6 +13,7 @@ import AdminBannerTab from '@/components/admin/AdminBannerTab.jsx';
 import AdminBlogTab from '@/components/admin/AdminBlogTab.jsx'; 
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import AdminContactUs from '../components/admin/AdminContactUs';
 
 const AdminPanel = () => {
   const { user, isAdmin, isLoading: authLoading } = useAuth();
@@ -88,7 +89,8 @@ const AdminPanel = () => {
     { id: 'orders', label: 'Orders', icon: ShoppingCart, component: <AdminOrdersTab orders={orders} /> },
     { id: 'customers', label: 'Users & Roles', icon: Users, component: <AdminCustomersTab customers={customers} setCustomers={setCustomers} /> },
     { id: 'banners', label: 'Banners', icon: ImageIcon, component: <AdminBannerTab /> },
-    { id: 'blog', label: 'Blog Management', icon: EditIcon, component: <AdminBlogTab /> }
+    { id: 'blog', label: 'Blog Management', icon: EditIcon, component: <AdminBlogTab /> },
+    { id: 'contactus', label: 'Contact Us', icon: Mails, component: <AdminContactUs /> }
   ];
 
   const ActiveComponent = TABS_CONFIG.find(tab => tab.id === activeTab)?.component;

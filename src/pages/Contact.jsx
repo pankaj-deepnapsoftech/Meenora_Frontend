@@ -7,39 +7,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { toast } from '@/components/ui/use-toast';
+import { useFormik } from 'formik';
+import { useContactContext } from '../contexts/ContactContext';
+
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+ 
+  const { PostContactData, loading } = useContactContext()
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setFormData({ name: '', email: '', subject: '', message: '' });
-      toast({
-        title: "Message Sent Successfully!",
-        description: "Thank you for contacting Meenora. We'll respond to your query within 24 business hours."
-      });
-    }, 1500);
-  };
+  const formik = useFormik({
+    initialValues: {
+      name:"",
+      email:"",
+      subject:"",
+      message:"",
+      
+    },
+    onSubmit: (values) => {
+      PostContactData(values);
+      formik.resetForm()
+    }
+  })
 
   const contactInfo = [
     {
@@ -133,7 +121,7 @@ const Contact = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  <form onSubmit={formik.handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label htmlFor="name" className="block text-sm font-semibold text-foreground mb-1.5">
@@ -143,8 +131,9 @@ const Contact = () => {
                           id="name"
                           type="text"
                           name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
+                          value={formik.values.name}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           placeholder="e.g., Anya Sharma"
                           required
                         />
@@ -157,8 +146,9 @@ const Contact = () => {
                           id="email"
                           type="email"
                           name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
+                          value={formik.values.email}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           placeholder="e.g., anya@example.com"
                           required
                         />
@@ -173,8 +163,9 @@ const Contact = () => {
                         id="subject"
                         type="text"
                         name="subject"
-                        value={formData.subject}
-                        onChange={handleInputChange}
+                        value={formik.values.subject}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         placeholder="e.g., Question about Nourishing Shampoo"
                         required
                       />
@@ -187,8 +178,9 @@ const Contact = () => {
                       <Textarea
                         id="message"
                         name="message"
-                        value={formData.message}
-                        onChange={handleInputChange}
+                        value={formik.values.message}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         rows={5}
                         placeholder="Tell us more about your inquiry..."
                         required
@@ -198,10 +190,9 @@ const Contact = () => {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full btn-primary text-base py-3"
-                      disabled={isSubmitting}
+                      className="w-full btn-primary text-base py-3"                     
                     >
-                      {isSubmitting ? (
+                      {loading ? (
                         <div className="flex items-center justify-center">
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground mr-2.5"></div>
                           Sending...

@@ -75,7 +75,7 @@ const AdminSidebar = ({ tabs, activeTab, setActiveTab }) => {
             variant="ghost"
             onClick={handleLogout}
             className="w-full flex items-center justify-start px-4 py-3.5 space-x-3.5 text-sm
-              text-white bg-destructive hover:bg-destructive/80 transition-colors"
+              text-white bg-destructive hover:text-white hover:bg-destructive/80 transition-colors"
           >
             <LogOut className="w-5 h-5" />
             <span>Logout</span>

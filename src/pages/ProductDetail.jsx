@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,9 +7,10 @@ import { ArrowLeft, Plus, Minus, Heart, Share2, Star, ShieldCheck, CheckCircle, 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { getProductById, products as allProducts } from '@/data/products';
+// import { getProductById, products as allProducts } from '@/data/products';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from '@/components/ui/use-toast';
+import { useAdminProductContext } from '../contexts/AdminProductContext';
 
 const AccordionItem = ({ title, children, isOpen, onToggle }) => {
   return (
@@ -41,10 +42,27 @@ const AccordionItem = ({ title, children, isOpen, onToggle }) => {
 };
 
 const ProductDetail = () => {
+
+  
   const { id } = useParams();
-  const navigate = useNavigate();
-  const product = getProductById(id);
-  const [quantity, setQuantity] = useState(1);
+  const { GetProductById, productData } = useAdminProductContext();
+  const [product, setProduct] = useState([]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const data = await GetProductById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      }
+    };
+
+    if (id) {
+      fetchProduct();
+    }
+  }, [id, GetProductById]);
+
   const [openAccordion, setOpenAccordion] = useState('benefits');
   const { addToCart } = useCart();
   const placeholderImage = "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/ff29976cca7dcad09825798e79b09247.webp";
@@ -98,9 +116,16 @@ const ProductDetail = () => {
     toast({ description: "🚧 Share feature isn't implemented yet—but don't worry! You can request it in your next prompt! 🚀" });
   };
 
-  const relatedProducts = allProducts.filter(p => p.category === product.category && p.id !== product.id).slice(0, 3);
-  const currentProductImage = product.id === 1 ? "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/fc0aadef6556030140ba44161c44ce87.webp" : placeholderImage;
+  const relatedProducts = productData.filter(p => p.category === product.category && p._id !== product._id).slice(0, 3);
+  
+  const currentProductImage =
+    product.image && product.image !== ""
+      ? product.image
+      : "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/fc0aadef6556030140ba44161c44ce87.webp";
 
+
+
+  console.log(currentProductImage)
   return (
     <>
       <Helmet>
@@ -165,7 +190,7 @@ const ProductDetail = () => {
                 </div>
               </div>
               
-              <p className="text-5xl font-display font-semibold text-primary">${product.price.toFixed(2)}</p>
+              <p className="text-5xl font-display font-semibold text-primary">${product.price}</p>
 
               {product.inStock ? (
                 <div className="space-y-6 pt-2">
@@ -242,11 +267,11 @@ const ProductDetail = () => {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
                 {relatedProducts.map((relatedProduct) => (
-                  <Card key={relatedProduct.id} className="card-hover bg-card overflow-hidden group">
+                  <Card key={relatedProduct._id} className="card-hover bg-card overflow-hidden group">
                     <Link to={`/product/${relatedProduct.id}`} className="block">
                       <div className="relative h-80 bg-muted/40">
                         <img   
-                          src={relatedProduct.id === 1 ? "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/fc0aadef6556030140ba44161c44ce87.webp" : placeholderImage}
+                          src={relatedProduct._id === 1 ? "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/fc0aadef6556030140ba44161c44ce87.webp" : placeholderImage}
                           className="w-full h-full object-contain transition-transform duration-500 ease-in-out group-hover:scale-105 p-5" 
                           alt={relatedProduct.name}
                            />
@@ -274,3 +299,21 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+// import React from 'react'
+// import { useParams } from 'react-router-dom';
+// import { useEffect, useState } from 'react';
+// import { useAdminProductContext } from '../contexts/AdminProductContext';
+
+// const ProductDetail = () => {
+
+
+//   return (
+//     <div>
+//       <h1>{product.name}</h1>
+//       <p>{product.description}</p>
+//       {/* Add more fields as needed */}
+//     </div>
+//   );
+// };
+
+// export default ProductDetail;

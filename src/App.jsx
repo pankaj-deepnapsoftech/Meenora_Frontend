@@ -24,6 +24,9 @@ import AdminLoginPage from '@/pages/AdminLogin.jsx';
 import { CartProvider } from '@/contexts/CartContext';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
+import AdminProductContextProvider from './contexts/AdminProductContext';
+import ContactProvider from './contexts/ContactContext';
+import AdminBlogProvider from './contexts/AdminBlogContext';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAdmin, isLoading } = useAuth();
@@ -64,7 +67,7 @@ const AppLayout = () => {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
@@ -111,9 +114,16 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <WishlistProvider>
-          <Router>
-            <AppLayout />
-          </Router>
+          <AdminProductContextProvider>
+            <ContactProvider>
+              <AdminBlogProvider>
+
+                <Router>
+                  <AppLayout />
+                </Router>
+              </AdminBlogProvider>
+            </ContactProvider>
+          </AdminProductContextProvider>
         </WishlistProvider>
       </CartProvider>
     </AuthProvider>
