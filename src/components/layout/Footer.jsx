@@ -30,9 +30,9 @@ const Footer = () => {
     { name: 'About Us', path: '/about' },
     { name: 'Shop', path: '/shop' },
     { name: 'Contact Us', path: '/contact' },
-    { name: 'FAQs', path: '#' },
-    { name: 'Privacy Policy', path: '#' },
-    { name: 'Terms of Service', path: '#' }
+    { name: 'Return and Refound', path: '#' },
+    { name: 'Privacy Policy', path: '#' }, 
+    { name: 'Terms of Service', path: '#' } 
   ];
 
   return (

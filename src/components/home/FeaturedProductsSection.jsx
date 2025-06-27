@@ -93,7 +93,7 @@ const FeaturedProductsSection = () => {
                   </h3>
                   <p className="text-muted-foreground text-sm line-clamp-2 h-10 flex-grow">{product.description}</p>
                   <div className="flex items-center justify-between pt-2 mt-auto">
-                    <span className="text-2xl font-display font-semibold text-primary">${product.price.toFixed(2)}</span>
+                    <span className="text-2xl font-display font-semibold text-primary">₹{product.price.toFixed(2)}</span>
                     <Button 
                       size="default" 
                       className="btn-primary group/btn"

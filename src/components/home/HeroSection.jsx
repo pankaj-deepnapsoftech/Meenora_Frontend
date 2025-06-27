@@ -1,11 +1,18 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, ShoppingBag, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAdminBannerContext } from '../../contexts/AdminBannerContext';
 
 const HeroSection = () => {
+  const { bannerDataBypage,GetBannerDataByPage } = useAdminBannerContext()
+
+  useEffect(()=>{
+    GetBannerDataByPage('home')
+  },[])
+  console.log(bannerDataBypage)
   const heroImageUrl = "https://storage.googleapis.com/hostinger-horizons-assets-prod/3271a3af-83a5-4b91-a7b1-58d1978fa9d4/fc0aadef6556030140ba44161c44ce87.webp";
 
   return (

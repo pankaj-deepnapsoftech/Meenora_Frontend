@@ -28,6 +28,7 @@ import AdminProductContextProvider from './contexts/AdminProductContext';
 import ContactProvider from './contexts/ContactContext';
 import AdminBlogProvider from './contexts/AdminBlogContext';
 import Blog from './pages/Blog';
+import AdminBannerProvider from './contexts/AdminBannerContext';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAdmin, isLoading } = useAuth();
@@ -119,9 +120,11 @@ function App() {
           <AdminProductContextProvider>
             <ContactProvider>
               <AdminBlogProvider>
-                <Router>
-                  <AppLayout />
-                </Router>
+                <AdminBannerProvider>
+                  <Router>
+                    <AppLayout />
+                  </Router>
+                </AdminBannerProvider>
               </AdminBlogProvider>
             </ContactProvider>
           </AdminProductContextProvider>

@@ -48,7 +48,7 @@ const AdminBlogProvider = ({ children }) => {
             toast.error(error?.response?.data?.message || "Failed to update blog.");
         } finally {
             setLoading(false);
-        }
+        } 
     };
 
     const DeleteBlogData = async (_id) => {

@@ -191,7 +191,7 @@ const ProductDetail = () => {
                 </div>
               </div>
               
-              <p className="text-5xl font-display font-semibold text-primary">${product.price}</p>
+              <p className="text-5xl font-display font-semibold text-primary">₹{product.price}</p>
 
               {product.status === "inStock" ? (
                 <div className="space-y-6 pt-2">
@@ -286,7 +286,7 @@ const ProductDetail = () => {
                         <h3 className="text-xl font-display text-foreground truncate group-hover:text-primary transition-colors">{relatedProduct.name}</h3>
                         <p className="text-sm text-muted-foreground line-clamp-2 h-10">{relatedProduct.description}</p>
                         <div className="flex justify-between items-center pt-2.5">
-                          <span className="text-2xl font-display font-semibold text-primary">${relatedProduct.price.toFixed(2)}</span>
+                          <span className="text-2xl font-display font-semibold text-primary">{relatedProduct.price.toFixed(2)}</span>
                           <Button variant="outline" size="default" className="border-primary text-primary hover:bg-primary/10 font-semibold">
                             View Details
                           </Button>
