@@ -82,7 +82,7 @@ const Shop = () => {
   }, [searchTerm, selectedCategory, sortBy, productData]);
 
   const handleAddToCart = (product) => {
-    if (!product.inStock) {
+    if (!product.status === "inStock") {
       toast({
         title: "Product Not Available",
         description: "This product is coming soon. Stay tuned for updates!",
