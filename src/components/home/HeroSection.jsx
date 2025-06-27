@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { useAdminBannerContext } from '../../contexts/AdminBannerContext';
 
 const HeroSection = () => {
-  const { bannerDataBypage,GetBannerDataByPage } = useAdminBannerContext()
+  const { bannerDataBypage, GetBannerDataByPage } = useAdminBannerContext()
 
   const bannerData = bannerDataBypage?.home?.[0] ;
 
   useEffect(()=>{
     GetBannerDataByPage('home')
+
   },[])
 
 
@@ -49,11 +50,20 @@ const HeroSection = () => {
               className="text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-foreground leading-tight tracking-tight"
             >
               {bannerData?.heading || "Because Self-Care Should Be"}
+             
+            </motion.h1>
+          
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
+              className="text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-foreground leading-tight tracking-tight"
+            >
+              {bannerData?.description || "Because Self-Care Should Be"}
               <span className="block gradient-text mt-2 lg:mt-3">
                 Simple, Clean, and Empowering.
               </span>
             </motion.h1>
-
             {/* Description */}
             <motion.p
               initial={{ opacity: 0, y: 30 }}
