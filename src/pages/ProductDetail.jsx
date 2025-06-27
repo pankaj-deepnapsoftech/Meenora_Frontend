@@ -47,6 +47,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const { GetProductById, productData } = useAdminProductContext();
   const [product, setProduct] = useState([]);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -91,7 +92,7 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    if (!product.inStock) {
+    if (!product.status === "inStock") {
       toast({
         title: "Product Not Available",
         description: `${product.name} is coming soon. We'll notify you!`,
@@ -192,7 +193,7 @@ const ProductDetail = () => {
               
               <p className="text-5xl font-display font-semibold text-primary">${product.price}</p>
 
-              {product.inStock ? (
+              {product.status === "inStock" ? (
                 <div className="space-y-6 pt-2">
                   <div className="flex items-center space-x-4">
                     <span className="text-base font-semibold text-foreground">Quantity:</span>
@@ -206,14 +207,19 @@ const ProductDetail = () => {
                       </Button>
                     </div>
                   </div>
-                  <Button size="lg" className="w-full btn-primary text-lg py-4 shadow-lg hover:shadow-primary/30 flex items-center group/cartbtn">
+                  <Button
+                    onClick={handleAddToCart} // ✅ Add this line
+                    size="lg"
+                    className="w-full btn-primary text-lg py-4 shadow-lg hover:shadow-primary/30 flex items-center group/cartbtn"
+                  >
                     <ShoppingBag className="h-5 w-5 mr-3 group-hover/cartbtn:animate-pulse" />
                     Add to Cart
                   </Button>
+
                 </div>
               ) : (
                 <Button size="lg" variant="outline" disabled className="w-full text-lg py-4 cursor-not-allowed">
-                  {product.comingSoon ? "Notify Me When Available" : "Out of Stock"}
+                  {product.status === "comingSoon" ? "Notify Me When Available" : "Out of Stock"}
                 </Button>
               )}
 

@@ -8,16 +8,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { products as allProducts } from '@/data/products.js';
+import { useAdminProductContext } from '../../contexts/AdminProductContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const {productData} = useAdminProductContext()
   const { getCartItemsCount } = useCart();
   const { user, logout, login } = useAuth();
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isComingSoonDropdownOpen, setIsComingSoonDropdownOpen] = useState(false);
   
-  const comingSoonNavProducts = allProducts.filter(p => p.comingSoon);
+  const comingSoonNavProducts = productData?.filter(p => p.status === "comingSoon");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -171,7 +173,7 @@ const Navbar = () => {
               <Button variant="ghost" size="icon" className="text-foreground/70 hover:text-primary hover:bg-primary/10">
                 <ShoppingBag className="w-7" />
                 {getCartItemsCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-4.5 w-4.5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-4.5 w-5 h-5 flex items-center justify-center">
                     {getCartItemsCount()}
                   </span>
                 )}

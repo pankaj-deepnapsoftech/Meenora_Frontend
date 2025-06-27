@@ -1,28 +1,36 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, ShoppingCart, Package, Users, DollarSign, AlertTriangle, CheckCircle2, LineChart, BarChartBig, PieChart as PieChartIcon } from 'lucide-react';
+import { TrendingUp, ShoppingCart, Package, Users, DollarSign, AlertTriangle, CheckCircle2, LineChart, BarChartBig, PieChart as PieChartIcon, ClipboardCheck } from 'lucide-react';
 import { products as allProducts } from '@/data/products';
 import { ResponsiveContainer, LineChart as ReLineChart, BarChart as ReBarChart, PieChart as RePieChart, Pie, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from 'recharts';
 import { toast } from '@/components/ui/use-toast';
+import { useAdminProductContext } from '../../contexts/AdminProductContext';
+import axiosHandler from '../../config/axiosConfig';
 
 const AdminDashboardTab = ({ orders, customers }) => {
-  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
-  const averageOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
-  const lowStockProducts = allProducts.filter(p => p.inStock && (p.stockCount || 10) < 5).length; 
+  const {productData} = useAdminProductContext()
+const [allData, setAllData] = useState()
+const getDashboardAllData = async() => {
+  try {
+    const res = await axiosHandler.get("/dashboard")
+
+    setAllData(res?.data?.data)
+  } catch (error) {
+    console.log(error)
+  }
+}
+useEffect(()=>{
+  getDashboardAllData()
+},[])
+  // const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  // const averageOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0;
+  // const lowStockProducts = allData.filter(p => p.inStock && (p.stockCount || 10) < 5).length; 
 
   const stats = [
-    {
-      title: 'Total Revenue',
-      value: `${totalRevenue.toFixed(2)}`,
-      icon: DollarSign,
-      color: 'text-green-main',
-      bgColor: 'bg-gradient-to-r from-green-50 to-green-50', // gradient light green
-      bgIconColor: 'bg-green-200',
-      trend: '+12.5% vs last month'
-    },
+
     {
       title: 'Total Orders',
       value: orders.length.toString(),
@@ -34,29 +42,38 @@ const AdminDashboardTab = ({ orders, customers }) => {
     },
     {
       title: 'Total Products',
-      value: allProducts.length.toString(),
+      value: allData?.products,
       icon: Package,
       color: 'text-purple-600',
       bgColor: 'bg-gradient-to-r from-purple-50  to-purple-50', // gradient light purple
       bgIconColor: 'bg-purple-200',
-      trend: `${allProducts.filter(p => p.inStock).length} in stock`
+      trend: `${productData.filter(p => p.status === "inStock").length} In stock`
     },
     {
-      title: 'Total Customers',
-      value: customers.length.toString(),
+      title: 'Total Contact Us',
+      value: allData?.ContactUS_Req ,
       icon: Users,
       color: 'text-pink-600',
       bgColor: 'bg-gradient-to-r from-pink-50  to-pink-50',  // gradient light pink
       bgIconColor: 'bg-pink-200',
       trend: '+15.3% growth'
-    }
+    },
+    {
+      title: 'Total Blog',
+      value: allData?.blog ,
+      icon: ClipboardCheck,
+      color: 'text-green-main',
+      bgColor: 'bg-gradient-to-r from-green-50 to-green-50', // gradient light green
+      bgIconColor: 'bg-green-200',
+      trend: '+12.5% vs last month'
+    },
   ];
   
 
-  const quickInsights = [
-    { title: "Average Order Value", value: `${averageOrderValue.toFixed(2)}`, icon: TrendingUp, color: 'text-primary', bgColor: 'bg-primary-soft' },
-    { title: "Low Stock Items", value: lowStockProducts.toString(), icon: lowStockProducts > 0 ? AlertTriangle : CheckCircle2, color: lowStockProducts > 0 ? 'text-red-main' : 'text-green-main', bgColor: lowStockProducts > 0 ? 'bg-red-soft' : 'bg-green-soft' },
-  ];
+  // const quickInsights = [
+  //   { title: "Average Order Value", value: `${averageOrderValue.toFixed(2)}`, icon: TrendingUp, color: 'text-primary', bgColor: 'bg-primary-soft' },
+  //   { title: "Low Stock Items", value: lowStockProducts.toString(), icon: lowStockProducts > 0 ? AlertTriangle : CheckCircle2, color: lowStockProducts > 0 ? 'text-red-main' : 'text-green-main', bgColor: lowStockProducts > 0 ? 'bg-red-soft' : 'bg-green-soft' },
+  // ];
 
   const getStatusClass = (status) => {
     switch (status) {
@@ -78,7 +95,7 @@ const AdminDashboardTab = ({ orders, customers }) => {
     { name: 'Jun', sales: Math.floor(Math.random() * 3000) + 1000 },
   ];
 
-  const categoryData = allProducts.reduce((acc, product) => {
+  const categoryData = productData.reduce((acc, product) => {
     const categoryName = product.category;
     const existingCategory = acc.find(item => item.name === categoryName);
     if (existingCategory) {
@@ -211,7 +228,7 @@ const AdminDashboardTab = ({ orders, customers }) => {
           </Card>
         </motion.div>
 
-        <motion.div className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
+        {/* <motion.div className="space-y-6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.5 }}>
           {quickInsights.map(insight => (
             <Card key={insight.title} className="stats-card shadow-md">
               <CardContent className="p-5">
@@ -227,7 +244,7 @@ const AdminDashboardTab = ({ orders, customers }) => {
               </CardContent>
             </Card>
           ))}
-        </motion.div>
+        </motion.div> */}
       </div>
     </div>
   );

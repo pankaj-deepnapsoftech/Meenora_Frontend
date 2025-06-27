@@ -176,8 +176,6 @@ const Shop = () => {
                       >
                         All Products
                       </button>
-
-
                       {shopCategories.map((category) => (
                         <button
                           key={category.slug}
@@ -196,7 +194,6 @@ const Shop = () => {
                     </div>
 
                   </div>
-
 
                   {/* Sort By */}
                   <div>
@@ -313,11 +310,11 @@ const Shop = () => {
                           </div>
                           <div className="  items-center justify-between mt-auto pt-2">
                             <p className="text-2xl  font-display font-semibold text-primary">
-                              ${product.price?.toFixed(2)}
+                              ₹{product.price?.toFixed(2)}
                             </p>
                             <Button
                               onClick={() => handleAddToCart(product)}
-                              disabled={product.status["inStock"]}
+                              disabled={product.status === "comingSoon"}
                               className="btn-primary flex justify-center w-full"
                             >
                               <ShoppingCart className="h-4 w-4 mr-2" />
