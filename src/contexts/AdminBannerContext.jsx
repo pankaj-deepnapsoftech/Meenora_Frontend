@@ -11,7 +11,7 @@ const AdminBannerProvider = ({ children }) => {
     const GetData = async () => {
         try {
             const res = await axiosHandler.get('/banners')
-            console.log(res?.data)
+      
             setBannerData(res?.data?.data)
         } catch (error) {
 

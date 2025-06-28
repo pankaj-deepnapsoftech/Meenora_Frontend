@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
@@ -10,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { toast } from '@/components/ui/use-toast';
 
 const Cart = () => {
-  const { items, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const { items, updateQuantity, removeFromCart, clearCart, getCartTotal } = useCart();
 
   const handleQuantityChange = (productId, newQuantity) => {
     updateQuantity(productId, newQuantity);
@@ -79,8 +78,12 @@ const Cart = () => {
   return (
     <>
       <Helmet>
-        <title>Shopping Cart ({items.length} items) - Meenora</title>
-        <meta name="description" content="Review your selected beauty products and proceed to checkout. Premium skincare and hair care products in your cart." />
+        {/* FIXED: Wrap dynamic items.length inside curly braces */}
+        <title>{`Shopping Cart (${items.length} item${items.length !== 1 ? 's' : ''}) - Meenora`}</title>
+        <meta
+          name="description"
+          content="Review your selected beauty products and proceed to checkout. Premium skincare and hair care products in your cart."
+        />
       </Helmet>
 
       <div className="min-h-screen bg-gray-50">
@@ -95,8 +98,8 @@ const Cart = () => {
                 Shopping Cart ({items.length} item{items.length !== 1 ? 's' : ''})
               </h1>
               {items.length > 0 && (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={handleClearCart}
                   className="text-red-600 border-red-600 hover:bg-red-50"
                 >
@@ -118,18 +121,17 @@ const Cart = () => {
                     <Card className="overflow-hidden">
                       <CardContent className="p-6">
                         <div className="flex items-center space-x-4">
-                          <img  
+                          <img
                             className="w-20 h-20 object-cover rounded-lg"
                             alt={item.name}
-                           src="https://images.unsplash.com/photo-1595872018818-97555653a011" />
-                          
+                            src={item?.image}
+                          />
+
                           <div className="flex-1">
                             <h3 className="text-lg font-semibold text-gray-900 mb-1">
                               {item.name}
                             </h3>
-                            <p className="text-gray-600 text-sm mb-2">
-                              {item.category}
-                            </p>
+                            <p className="text-gray-600 text-sm mb-2">{item.category}</p>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-2">
                                 <Button
@@ -151,10 +153,10 @@ const Cart = () => {
                                   <Plus className="h-3 w-3" />
                                 </Button>
                               </div>
-                              
+
                               <div className="flex items-center space-x-4">
                                 <span className="text-lg font-bold text-pink-600">
-                                  ${(item.price * item.quantity).toFixed(2)}
+                                  ₹{(item.price * item.quantity).toFixed(2)}
                                 </span>
                                 <Button
                                   variant="ghost"
@@ -185,11 +187,11 @@ const Cart = () => {
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">
                       Order Summary
                     </h2>
-                    
+
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-gray-600">
                         <span>Subtotal</span>
-                        <span>${getCartTotal().toFixed(2)}</span>
+                        <span>{getCartTotal().toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-gray-600">
                         <span>Shipping</span>
@@ -197,12 +199,12 @@ const Cart = () => {
                       </div>
                       <div className="flex justify-between text-gray-600">
                         <span>Tax</span>
-                        <span>${(getCartTotal() * 0.08).toFixed(2)}</span>
+                        <span>{(getCartTotal() * 0.08).toFixed(2)}</span>
                       </div>
                       <div className="border-t pt-3">
                         <div className="flex justify-between text-lg font-bold text-gray-900">
                           <span>Total</span>
-                          <span>${(getCartTotal() * 1.08).toFixed(2)}</span>
+                          <span>{(getCartTotal() * 1.08).toFixed(2)}</span>
                         </div>
                       </div>
                     </div>

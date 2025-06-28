@@ -16,7 +16,7 @@ const OrderSummary = ({ items, getCartTotal }) => {
                 <img  
                   className="w-12 h-12 object-cover rounded-lg"
                   alt={item.name}
-                 src="https://images.unsplash.com/photo-1595872018818-97555653a011" />
+                 src={item.image} />
                 <div className="flex-1">
                   <h4 className="font-medium text-gray-900">{item.name}</h4>
                   <p className="text-sm text-gray-600">Qty: {item.quantity}</p>

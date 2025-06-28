@@ -18,7 +18,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isComingSoonDropdownOpen, setIsComingSoonDropdownOpen] = useState(false);
-  
+  const itemCount = getCartItemsCount();
   const comingSoonNavProducts = productData?.filter(p => p.status === "comingSoon");
 
   useEffect(() => {
@@ -59,7 +59,8 @@ const Navbar = () => {
   const navItemsEnd = [
     { name: 'About Us', path: '/about' },
     { name: 'Contact Us', path: '/contact' },
-    { name: 'Blog', path: '/blog'}
+    { name: 'Blog', path: '/blog'},
+    
   ];
   
   const renderComingSoonDropdown = () => (
@@ -170,11 +171,15 @@ const Navbar = () => {
             </Button>
 
             <Link to="/cart" className="relative">
-              <Button variant="ghost" size="icon" className="text-foreground/70 hover:text-primary hover:bg-primary/10">
-                <ShoppingBag className="w-7" />
-                {getCartItemsCount() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full h-4.5 w-5 h-5 flex items-center justify-center">
-                    {getCartItemsCount()}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-foreground/70 hover:text-primary hover:bg-primary/10"
+              >
+                <ShoppingBag className="w-7 h-7" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {itemCount}
                   </span>
                 )}
               </Button>

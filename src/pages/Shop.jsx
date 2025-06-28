@@ -97,6 +97,7 @@ const Shop = () => {
       description: `${product.name} has been added to your cart.`
     });
   };
+  
 
   return (
     <>

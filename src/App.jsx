@@ -20,8 +20,6 @@ import AdminPanel from '@/pages/AdminPanel.jsx';
 import LoginPage from '@/pages/Login.jsx';
 import SignupPage from '@/pages/Signup.jsx';
 import AdminLoginPage from '@/pages/AdminLogin.jsx';
-
-import { CartProvider } from '@/contexts/CartContext';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import AdminProductContextProvider from './contexts/AdminProductContext';
@@ -29,6 +27,7 @@ import ContactProvider from './contexts/ContactContext';
 import AdminBlogProvider from './contexts/AdminBlogContext';
 import Blog from './pages/Blog';
 import AdminBannerProvider from './contexts/AdminBannerContext';
+import { CartProvider } from './contexts/CartContext';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const { user, isAdmin, isLoading } = useAuth();
