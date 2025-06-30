@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BarChart3, LogOut, Menu, X } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuthContext } from '../../contexts/AuthContext';
+// import { useAuth } from '@/contexts/AuthContext';
 
 const AdminSidebar = ({ tabs, activeTab, setActiveTab }) => {
-  const { logout } = useAuth();
+  const { UserLogout } = useAuthContext();
   const navigate = useNavigate();
   const [showSidebar, setShowSidebar] = useState(false);
 
   const handleLogout = () => {
-    logout();
+    UserLogout();
     navigate('/admin/login');
   };
 

@@ -25,14 +25,10 @@ const AdminProductContextProvider = ({ children }) => {
     const PostProductData = async (formData) => {
         setLoading(true);
         try {
-            const res = await axiosHandler.post("/products", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                }
-              });
+            const res = await axiosHandler.post("/products", formData);
+            console.log(res?.data)
             toast.success(res?.data?.message);
             GetProductData();
-            console.log(res?.data)
         } catch (error) {
             console.error(error);
             toast.error(error?.message);

@@ -1,90 +1,126 @@
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { toast } from '@/components/ui/use-toast';
+import { createContext, useContext, useState, useEffect } from "react";
+import axiosHandler from "../config/axiosConfig";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [token, setToken] = useState(null); // Mock JWT
+export const useAuthContext = () => useContext(AuthContext);
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('meenora_user');
-    const savedToken = localStorage.getItem('meenora_token');
-    if (savedUser && savedToken) {
-      try {
-        const parsedUser = JSON.parse(savedUser);
-         // Basic token validation (in real app, verify with backend)
-        if (parsedUser && savedToken.startsWith('mockJWT_')) {
-          setUser(parsedUser);
-          setToken(savedToken);
-        } else {
-          localStorage.removeItem('meenora_user');
-          localStorage.removeItem('meenora_token');
-        }
-      } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
-        localStorage.removeItem('meenora_user');
-        localStorage.removeItem('meenora_token');
-      }
+const AuthContextProvider = ({ children }) => {
+  const navigate = useNavigate();
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState([])
+  const [authLoading, setAuthLoading] = useState(true);
+
+  const isAdmin = () => user?.role === 'admin';
+
+
+  const UserRegister = async (formData) => {
+    try {
+      const res = await axiosHandler.post("/auth/register", formData);
+      toast.success(res?.data?.message || "Registration successful");
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || error?.message);
     }
-    setIsLoading(false);
+  };
+
+  const UserLogin = async (formData) => {
+    try {
+      const res = await axiosHandler.post("/auth/login", formData);
+      const authToken = res?.data?.token;
+      const loggedInUser = res?.data?.user;
+
+      if (!authToken || !loggedInUser) {
+        toast.error("Invalid login response.");
+        return;
+      }
+
+      // Admin login page - block non-admin users
+      if (window.location.pathname === '/admin/login') {
+        if (loggedInUser.role !== 'admin') {
+          toast.error("Access denied: Only admins can log in here.");
+          navigate('/login');
+          return;
+        }
+      }
+
+      // User login page - block admin users
+      if (window.location.pathname === '/login') {
+        if (loggedInUser.role !== 'user') {
+          toast.error("Access denied: Only regular users can log in here.");
+          navigate('/admin/login');
+          return;
+        }
+      }
+
+      // Valid login, set auth and redirect
+      setToken(authToken);
+      setUser(loggedInUser);
+      localStorage.setItem("authToken", authToken);
+
+      toast.success(res?.data?.message || "Login successful");
+
+      // Redirect based on role
+      if (loggedInUser.role === 'admin') {
+        navigate('/admin');
+      } else if (loggedInUser.role === 'user') {
+        navigate('/dashboard');
+      }
+
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || error?.message);
+    }
+  };
+  
+
+
+  const UserProfileGet = async () => {
+    try {
+      const res = await axiosHandler.get('/auth/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(res?.data.user);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.message);
+    } finally {
+      setAuthLoading(false); // mark loading as complete
+    }
+  };
+
+
+  const UserLogout = () => {
+    setToken(null);
+    localStorage.removeItem("authToken");
+    navigate("/login");
+
+  };
+  useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    if (storedToken && !token) {
+      setToken(storedToken); // will trigger another useEffect to call UserProfileGet
+    } else {
+      setAuthLoading(false);
+    }
   }, []);
 
-  const login = (userData, userToken) => {
-    setUser(userData);
-    setToken(userToken);
-    localStorage.setItem('meenora_user', JSON.stringify(userData));
-    localStorage.setItem('meenora_token', userToken);
-  };
+  useEffect(() => {
+    if (token) {
+      UserProfileGet();
+    }
+  }, [token]);
+  
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('meenora_user');
-    localStorage.removeItem('meenora_token');
-    // Optionally, clear cart and wishlist on logout if they are user-specific server-side
-    // For localStorage based cart/wishlist, this might not be necessary or desired
-    toast({ title: "Logged out successfully!"});
-  };
 
-  const isAdmin = () => {
-    return user?.role === 'admin';
-  };
-
-  // Mock signup function
-  const signup = (newUserData) => {
-    // In a real app, this would involve an API call
-    // For mock, we'll just log them in and save to localStorage
-    const mockToken = `mockJWT_${Date.now()}`;
-    login(newUserData, mockToken);
-    // Potentially store user in a mock user list in localStorage if not using a backend
-    let users = JSON.parse(localStorage.getItem('meenora_users_list') || '[]');
-    users.push(newUserData);
-    localStorage.setItem('meenora_users_list', JSON.stringify(users));
-    return { success: true, user: newUserData, token: mockToken };
-  };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      token,
-      login,
-      logout,
-      signup,
-      isAdmin,
-      isLoading
-    }}>
+    <AuthContext.Provider value={{ token, user, UserRegister, UserLogin, UserLogout, authLoading, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export default AuthContextProvider;

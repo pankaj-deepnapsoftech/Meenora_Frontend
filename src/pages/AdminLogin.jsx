@@ -7,53 +7,27 @@ import { Mail, Lock, LogIn, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
+
 import { toast } from '@/components/ui/use-toast';
+import { useAuthContext } from '../contexts/AuthContext';
+import { useFormik } from 'formik';
 
 const AdminLoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
 
-  const adminCredentials = {
-    email: 'admin@meenora.in',
-    password: 'Admin123', // Store securely in .env for real app
-    role: 'admin',
-    name: 'Meenora Admin'
-  };
+  // const [isLoading, setIsLoading] = useState(false);
+  const { user, UserLogin } = useAuthContext()
+  // const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: (value) => {
+      UserLogin(value)
+    }
+  })
 
-    // Mock Admin API call / User validation
-    setTimeout(() => {
-      if (email === adminCredentials.email && password === adminCredentials.password) {
-        const mockToken = `mockJWT_admin_${Date.now()}`;
-        login({
-          id: 'admin_user_01',
-          name: adminCredentials.name,
-          email: adminCredentials.email,
-          role: adminCredentials.role
-        }, mockToken);
-
-        toast({
-          title: "Admin Login Successful!",
-          description: `Welcome, ${adminCredentials.name}! Accessing Admin Panel...`,
-        });
-        navigate('/admin');
-      } else {
-        toast({
-          title: "Admin Login Failed",
-          description: "Invalid admin credentials. Please try again.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-      }
-    }, 1000);
-  };
 
   return (
     <>
@@ -81,7 +55,7 @@ const AdminLoginPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={formik.handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium text-foreground">Admin Email</label>
                   <div className="relative">
@@ -90,8 +64,9 @@ const AdminLoginPage = () => {
                       id="email"
                       type="email"
                       placeholder="admin@meenora.in"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={formik.values.email}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       required
                       className="pl-10 text-base py-3"
                     />
@@ -105,24 +80,18 @@ const AdminLoginPage = () => {
                       id="password"
                       type="password"
                       placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={formik.values.password}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       required
                       className="pl-10 text-base py-3"
                     />
                   </div>
                 </div>
-                <Button type="submit" className="w-full btn-primary text-base py-3" disabled={isLoading}>
-                  {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground mr-2"></div>
-                      Authenticating...
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center">
-                      <LogIn className="h-5 w-5 mr-2" /> Access Panel
-                    </div>
-                  )}
+                <Button type="submit" className="w-full btn-primary text-base py-3" >
+                  <div className="flex items-center justify-center">
+                    <LogIn className="h-5 w-5 mr-2" /> Access Panel
+                  </div>
                 </Button>
               </form>
             </CardContent>

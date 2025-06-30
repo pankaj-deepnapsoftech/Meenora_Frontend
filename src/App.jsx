@@ -4,6 +4,7 @@ import {
   Route,
   Navigate,
   useLocation,
+  BrowserRouter,
 } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import Navbar from '@/components/layout/Navbar';
@@ -20,7 +21,7 @@ import AdminPanel from '@/pages/AdminPanel.jsx';
 import LoginPage from '@/pages/Login.jsx';
 import SignupPage from '@/pages/Signup.jsx';
 import AdminLoginPage from '@/pages/AdminLogin.jsx';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+// import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { WishlistProvider } from '@/contexts/WishlistContext';
 import AdminProductContextProvider from './contexts/AdminProductContext';
 import ContactProvider from './contexts/ContactContext';
@@ -28,11 +29,11 @@ import AdminBlogProvider from './contexts/AdminBlogContext';
 import Blog from './pages/Blog';
 import AdminBannerProvider from './contexts/AdminBannerContext';
 import { CartProvider } from './contexts/CartContext';
-
+import AuthContextProvider, { useAuthContext } from './contexts/AuthContext';
 const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { user, isAdmin, isLoading } = useAuth();
+  const { user, authLoading, isAdmin } = useAuthContext();
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -45,19 +46,19 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   }
 
   if (adminOnly && !isAdmin()) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
 };
 
 
+
+
 const AppLayout = () => {
   const location = useLocation();
-
-
   const hideLayout = location.pathname.startsWith('/admin');
-
+  const { user, token } = useAuthContext()
   return (
     <div className="min-h-screen flex flex-col font-sans">
       {!hideLayout && <Navbar />}
@@ -113,24 +114,25 @@ const AppLayout = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <WishlistProvider>
-          <AdminProductContextProvider>
-            <ContactProvider>
-              <AdminBlogProvider>
-                <AdminBannerProvider>
-                  <Router>
+    <BrowserRouter>
+      <AuthContextProvider>
+        <CartProvider>
+          <WishlistProvider>
+            <AdminProductContextProvider>
+              <ContactProvider>
+                <AdminBlogProvider>
+                  <AdminBannerProvider>
                     <AppLayout />
-                  </Router>
-                </AdminBannerProvider>
-              </AdminBlogProvider>
-            </ContactProvider>
-          </AdminProductContextProvider>
-        </WishlistProvider>
-      </CartProvider>
-    </AuthProvider>
+                  </AdminBannerProvider>
+                </AdminBlogProvider>
+              </ContactProvider>
+            </AdminProductContextProvider>
+          </WishlistProvider>
+        </CartProvider>
+      </AuthContextProvider>
+    </BrowserRouter>
   );
 }
+
 
 export default App;

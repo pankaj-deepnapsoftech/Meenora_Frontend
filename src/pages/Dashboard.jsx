@@ -6,15 +6,18 @@ import { User, Package, Heart, Settings, LogOut, Eye, Calendar, CreditCard } fro
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
+// import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  // const { user, logout } = useAuth();
+  const { user, UserLogout
+  } = useAuthContext()
   const [activeTab, setActiveTab] = useState('orders');
   const [orders, setOrders] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-
+  console.log(user)
   useEffect(() => {
     // Load orders from localStorage
     const savedOrders = JSON.parse(localStorage.getItem('meenora_orders') || '[]');
@@ -26,7 +29,7 @@ const Dashboard = () => {
   }, []);
 
   const handleLogout = () => {
-    logout();
+    UserLogout();
     toast({
       title: "Logged out successfully",
       description: "You have been logged out of your account."
@@ -55,19 +58,20 @@ const Dashboard = () => {
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Please log in</h1>
-          <p className="text-gray-600 mb-8">You need to be logged in to access your dashboard.</p>
-          <Button onClick={() => window.location.href = '/'}>
-            Go to Home
-          </Button>
-        </div>
+if (!user || user.role !== 'user') {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+        <p className="text-gray-600 mb-8">Only regular users can access the dashboard.</p>
+        <Button onClick={() => window.location.href = user?.role === 'admin' ? '/admin' : '/'}>
+          {user?.role === 'admin' ? 'Go to Admin Panel' : 'Go to Home'}
+        </Button>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
 
   return (
     <>
@@ -113,11 +117,10 @@ const Dashboard = () => {
                         <button
                           key={tab.id}
                           onClick={() => setActiveTab(tab.id)}
-                          className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${
-                            activeTab === tab.id
-                              ? 'bg-pink-100 text-pink-700'
-                              : 'text-gray-600 hover:bg-gray-100'
-                          }`}
+                          className={`w-full flex items-center space-x-3 px-3 py-2 rounded-md transition-colors ${activeTab === tab.id
+                            ? 'bg-pink-100 text-pink-700'
+                            : 'text-gray-600 hover:bg-gray-100'
+                            }`}
                         >
                           <tab.icon className="h-4 w-4" />
                           <span>{tab.label}</span>
@@ -188,14 +191,14 @@ const Dashboard = () => {
                                       </p>
                                     </div>
                                   </div>
-                                  
+
                                   <div className="space-y-2">
                                     {order.items.map((item) => (
                                       <div key={item.id} className="flex items-center space-x-3">
-                                        <img  
+                                        <img
                                           className="w-12 h-12 object-cover rounded-lg"
                                           alt={item.name}
-                                         src="https://images.unsplash.com/photo-1595872018818-97555653a011" />
+                                          src="https://images.unsplash.com/photo-1595872018818-97555653a011" />
                                         <div className="flex-1">
                                           <p className="font-medium text-gray-900">{item.name}</p>
                                           <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
@@ -212,8 +215,8 @@ const Dashboard = () => {
                                       <Eye className="h-4 w-4 mr-2" />
                                       View Details
                                     </Button>
-                                    <Button 
-                                      variant="outline" 
+                                    <Button
+                                      variant="outline"
                                       size="sm"
                                       onClick={() => toast({ description: "🚧 Reorder feature isn't implemented yet—but don't worry! You can request it in your next prompt! 🚀" })}
                                     >
@@ -299,7 +302,7 @@ const Dashboard = () => {
                             />
                           </div>
                         </div>
-                        <Button 
+                        <Button
                           className="btn-primary text-white"
                           onClick={() => toast({ description: "🚧 Profile editing isn't implemented yet—but don't worry! You can request it in your next prompt! 🚀" })}
                         >
@@ -331,8 +334,8 @@ const Dashboard = () => {
                               <h4 className="font-medium text-gray-900">Email Notifications</h4>
                               <p className="text-sm text-gray-600">Receive updates about your orders</p>
                             </div>
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => toast({ description: "🚧 Notification settings aren't implemented yet—but don't worry! You can request it in your next prompt! 🚀" })}
                             >
@@ -344,8 +347,8 @@ const Dashboard = () => {
                               <h4 className="font-medium text-gray-900">Payment Methods</h4>
                               <p className="text-sm text-gray-600">Manage your saved payment methods</p>
                             </div>
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => toast({ description: "🚧 Payment method management isn't implemented yet—but don't worry! You can request it in your next prompt! 🚀" })}
                             >
@@ -358,8 +361,8 @@ const Dashboard = () => {
                               <h4 className="font-medium text-gray-900">Privacy Settings</h4>
                               <p className="text-sm text-gray-600">Control your privacy preferences</p>
                             </div>
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => toast({ description: "🚧 Privacy settings aren't implemented yet—but don't worry! You can request it in your next prompt! 🚀" })}
                             >

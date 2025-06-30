@@ -7,56 +7,71 @@ import { Mail, Lock, LogIn, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
+// import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
+import { useFormik } from 'formik';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/dashboard";
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [isLoading, setIsLoading] = useState(false);
+  // const { login } = useAuth();
+ 
+  // const location = useLocation();
+  // const from = location.state?.from?.pathname || "/dashboard";
+  const { UserLogin } = useAuthContext()
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   setIsLoading(true);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  //   // Mock API call / User validation
+  //   setTimeout(() => {
+  //     const users = JSON.parse(localStorage.getItem('meenora_users_list') || '[]');
+  //     const foundUser = users.find(u => u.email === email);
 
-    // Mock API call / User validation
-    setTimeout(() => {
-      const users = JSON.parse(localStorage.getItem('meenora_users_list') || '[]');
-      const foundUser = users.find(u => u.email === email);
-
-      if (foundUser && foundUser.password === password) {
-        if (foundUser.role === 'admin') {
-           toast({
-            title: "Admin Login Required",
-            description: "Please use the admin login page for admin accounts.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          navigate('/admin/login');
-          return;
-        }
+  //     if (foundUser && foundUser.password === password) {
+  //       if (foundUser.role === 'admin') {
+  //          toast({
+  //           title: "Admin Login Required",
+  //           description: "Please use the admin login page for admin accounts.",
+  //           variant: "destructive",
+  //         });
+  //         setIsLoading(false);
+  //         navigate('/admin/login');
+  //         return;
+  //       }
         
-        const mockToken = `mockJWT_${Date.now()}_${foundUser.id}`;
-        login(foundUser, mockToken);
-        toast({
-          title: "Login Successful!",
-          description: `Welcome back, ${foundUser.name}!`,
-        });
-        navigate(from, { replace: true });
-      } else {
-        toast({
-          title: "Login Failed",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-      }
-    }, 1000);
-  };
+  //       const mockToken = `mockJWT_${Date.now()}_${foundUser.id}`;
+  //       login(foundUser, mockToken);
+  //       toast({
+  //         title: "Login Successful!",
+  //         description: `Welcome back, ${foundUser.name}!`,
+  //       });
+  //       navigate(from, { replace: true });
+  //     } else {
+  //       toast({
+  //         title: "Login Failed",
+  //         description: "Invalid email or password. Please try again.",
+  //         variant: "destructive",
+  //       });
+  //       setIsLoading(false);
+  //     }
+  //   }, 1000);
+  // };
+
+  const formik = useFormik({
+    initialValues: {    
+      email: '',
+      password: ''
+    },
+    onSubmit: (value) => {
+      UserLogin(value)
+      formik.resetForm()
+    
+    }
+   })
+
 
   return (
     <>
@@ -82,7 +97,7 @@ const LoginPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={formik.handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-sm font-medium text-foreground">Email Address</label>
                   <div className="relative">
@@ -91,8 +106,9 @@ const LoginPage = () => {
                       id="email"
                       type="email"
                       placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={formik.values.email}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       required
                       className="pl-10 text-base py-3"
                     />
@@ -106,8 +122,9 @@ const LoginPage = () => {
                       id="password"
                       type="password"
                       placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      value={formik.values.password}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       required
                       className="pl-10 text-base py-3"
                     />
@@ -118,17 +135,14 @@ const LoginPage = () => {
                     </Button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full btn-primary text-base py-3" disabled={isLoading}>
-                  {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground mr-2"></div>
-                      Signing In...
-                    </div>
-                  ) : (
+                <Button type="submit" className="w-full btn-primary text-base py-3" >
+                 
+                 
+               
                     <div className="flex items-center justify-center">
                        <LogIn className="h-5 w-5 mr-2" /> Sign In
                     </div>
-                  )}
+                
                 </Button>
               </form>
             </CardContent>

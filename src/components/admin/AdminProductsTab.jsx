@@ -16,19 +16,23 @@ import { useFormik } from 'formik';
 import { productValidationSchema } from '../../Validations/ProductValidations';
 import LoaderPage from '../../Loader/Loader';
 import Pagination from '../../pages/Pagination';
+import { ImageUploader } from '../../ImagesUploader';
 
 const AdminProductsTab = () => {
-  const { productData, PostProductData, DeleteProduct, UpdatedProduct, loading,page,setPage } = useAdminProductContext()
+  const { productData, PostProductData, DeleteProduct, UpdatedProduct, loading, page, setPage } = useAdminProductContext()
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [edittable, setEdittable] = useState(null)
-  const [currIMg, setCuurIMg] = useState(null)
+  // const [imageFileName, setImageFileName] = useState('');
+
   const filteredProducts = productData?.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+
 
 
   const formik = useFormik({
@@ -48,24 +52,30 @@ const AdminProductsTab = () => {
     enableReinitialize: true,
     validationSchema: productValidationSchema,
     onSubmit: async (values) => {
+
       const formData = new FormData();
-      for (let key in values) {
-        formData.append(key, values[key]);
-      }
+      formData.append("file", values.image);
+      const imageUrl = await ImageUploader(formData);
+
+      const productPayload = {
+        ...values,
+        image: imageUrl,
+      };
+
 
       try {
         if (edittable) {
-          UpdatedProduct(values._id, formData)
-          setIsModalOpen(false)
+          await UpdatedProduct(values._id, productPayload);
         } else {
-          PostProductData(formData)
-          setIsModalOpen(false)
+          await PostProductData(productPayload);
         }
-        formik.resetForm()
+        setIsModalOpen(false);
+        formik.resetForm();
       } catch (err) {
         console.error('Error uploading product:', err);
       }
     }
+
 
   })
 
@@ -77,13 +87,15 @@ const AdminProductsTab = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
+       
       };
       reader.readAsDataURL(file);
     } else {
       setImagePreview(null);
+
     }
   };
-
+  
   const handleDeleteProduct = (_id) => {
     DeleteProduct(_id)
   };
@@ -93,15 +105,17 @@ const AdminProductsTab = () => {
   useEffect(() => {
     if (edittable && edittable.image) {
       setImagePreview(edittable.image);
+      
     } else {
       setImagePreview(null);
     }
   }, [edittable]);
 
+
   return (
-  <>
-  {
-    loading ? <LoaderPage/> : (
+    <>
+      {
+        loading ? <LoaderPage /> : (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
@@ -141,7 +155,7 @@ const AdminProductsTab = () => {
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[800px]">
-                    <thead className="bg-muted/50 border-b border-border">
+                    <thead className="bg-muted/50 border-b border-border whitespace-nowrap">
                       <tr>
                         <th className="text-left p-4 font-semibold text-foreground text-sm">Product</th>
                         <th className="text-left p-4 font-semibold text-foreground text-sm">Category</th>
@@ -276,7 +290,7 @@ const AdminProductsTab = () => {
                   {/* Section: Pricing & Status */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
                       <input
                         type="number"
                         name="price"
@@ -299,6 +313,9 @@ const AdminProductsTab = () => {
                         onBlur={formik.handleBlur}
                         className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       >
+                        <option value="" disabled selected >
+                          Select Status
+                        </option>
                         <option value="inStock">In Stock</option>
                         <option value="featured">Featured Product</option>
                         <option value="comingSoon">Coming Soon</option>
@@ -335,6 +352,9 @@ const AdminProductsTab = () => {
                       onChange={handleImageChange}
                       className="w-full text-sm file:py-2 file:px-4 file:border-0 file:rounded-lg file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
                     />
+                   
+                   
+
                     {imagePreview && (
                       <img
                         src={imagePreview}
@@ -346,6 +366,7 @@ const AdminProductsTab = () => {
                       <p className="text-red-500 text-xs mt-1">{formik.errors.image}</p>
                     )}
                   </div>
+
 
                   {/* Section: Ingredients, Benefits, How to Use */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -425,9 +446,9 @@ const AdminProductsTab = () => {
             </Dialog>
             <Pagination page={page} setPage={setPage} hasNextPage={productData?.length === 10} />
           </div>
-    )
-  }
-  </>  
+        )
+      }
+    </>
   );
 };
 

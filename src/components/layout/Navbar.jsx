@@ -4,22 +4,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, User, Menu, X, Search, Heart, ChevronDown, BookOpen, Sun, Moon, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { products as allProducts } from '@/data/products.js';
 import { useAdminProductContext } from '../../contexts/AdminProductContext';
+import { useAuthContext } from '../../contexts/AuthContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const {productData} = useAdminProductContext()
+  const { productData } = useAdminProductContext()
   const { getCartItemsCount } = useCart();
-  const { user, logout, login } = useAuth();
+  const { user, UserLogout,token } = useAuthContext();
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isComingSoonDropdownOpen, setIsComingSoonDropdownOpen] = useState(false);
   const itemCount = getCartItemsCount();
   const comingSoonNavProducts = productData?.filter(p => p.status === "comingSoon");
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,27 +30,36 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleAuthAction = () => {
-    if (user) {
-      logout();
-      toast({
-        title: "Logged out successfully!",
-        description: "You've been logged out. See you soon!"
-      });
-    } else {
-      const mockUser = {
-        id: 1,
-        name: "Aisha Khan", 
-        email: "aisha@meenora.com",
-        role: "user"
-      };
-      login(mockUser);
-      toast({
-        title: "Welcome, Aisha!",
-        description: "You've successfully logged in."
-      });
-    }
-  };
+  // const handleLogout = () => {
+  //   UserLogout(); // Assuming this clears auth state in context
+  //   toast({
+  //     title: "Logged out successfully!",
+  //     description: "You have been logged out. See you soon!",
+  //   });
+  //   // Redirect to home or login page
+  // };
+  
+  // const handleAuthAction = () => {
+  //   if (user) {
+  //     logout();
+  //     toast({
+  //       title: "Logged out successfully!",
+  //       description: "You've been logged out. See you soon!"
+  //     });
+  //   } else {
+  //     const mockUser = {
+  //       id: 1,
+  //       name: "Aisha Khan", 
+  //       email: "aisha@meenora.com",
+  //       role: "user"
+  //     };
+  //     login(mockUser);
+  //     toast({
+  //       title: "Welcome, Aisha!",
+  //       description: "You've successfully logged in."
+  //     });
+  //   }
+  // };
 
   const navItemsBase = [
     { name: 'Home', path: '/' },
@@ -59,12 +69,12 @@ const Navbar = () => {
   const navItemsEnd = [
     { name: 'About Us', path: '/about' },
     { name: 'Contact Us', path: '/contact' },
-    { name: 'Blog', path: '/blog'},
-    
+    { name: 'Blog', path: '/blog' },
+
   ];
-  
+
   const renderComingSoonDropdown = () => (
-    <div 
+    <div
       className="relative"
       onMouseEnter={() => setIsComingSoonDropdownOpen(true)}
       onMouseLeave={() => setIsComingSoonDropdownOpen(false)}
@@ -98,7 +108,7 @@ const Navbar = () => {
       </AnimatePresence>
     </div>
   );
-  
+
 
   return (
     <nav className={`sticky top-0 z-50 transition-all duration-300  ${isScrolled ? 'backdrop-blur-md shadow-lg bg-[#dddddd83]' : 'border-b border-[#ffff] shadow-md bg-card/90'}`}>
@@ -115,7 +125,7 @@ const Navbar = () => {
               <img
                 src="/Logo/Company_logo2.png"
                 alt="Company Logo"
-                className="object-contain w-48 h-auto"
+                className="object-contain w-64 h-auto"
               />
             </motion.span>
           </Link>
@@ -127,13 +137,13 @@ const Navbar = () => {
                 to={item.path}
                 onClick={item.onClick}
                 className={({ isActive }) =>
-                  `text-[18px] font-medium transition-colors duration-200 px-4 py-2 rounded-md
-              ${isActive ? 'bg-primary text-white px-6 ' : 'text-foreground/80 hover:text-primary'}`
+                  `text-[18px] font-medium transition-colors duration-200 px-4 py-2 rounded-3xl
+              ${isActive ? 'bg-primary text-white px-6  ' : 'text-foreground/80 hover:text-primary'}`
                 }
               >
                 {item.name}
               </NavLink>
-         
+
             ))}
             {renderComingSoonDropdown()}
             {navItemsEnd.map((item) => (
@@ -152,7 +162,7 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3">
-             <Button
+            <Button
               variant="ghost"
               size="icon"
               className="text-foreground/70 hover:text-primary hover:bg-primary/10"
@@ -190,7 +200,7 @@ const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 className="text-foreground/70 hover:text-primary hover:bg-primary/10"
-                onClick={() => user ? navigate('/dashboard') : handleAuthAction()}
+                onClick={() => token ? navigate('/dashboard') : navigate('/login')}
               >
                 <User className="w-7" />
               </Button>
@@ -216,50 +226,50 @@ const Navbar = () => {
               className="md:hidden border-t border-border/50 py-4 bg-card/95 shadow-lg"
             >
               <div className="flex flex-col space-y-3">
-                {[...navItemsBase, {name: "Coming Soon", isDropdown: true}, ...navItemsEnd].map((item) => 
+                {[...navItemsBase, { name: "Coming Soon", isDropdown: true }, ...navItemsEnd].map((item) =>
                   item.isDropdown ? (
                     <div key="coming-soon-mobile" className="px-4">
-                       <button 
+                      <button
                         onClick={() => setIsComingSoonDropdownOpen(!isComingSoonDropdownOpen)}
                         className="text-foreground/90 hover:text-primary transition-colors duration-200 font-medium text-base py-2.5 rounded-md hover:bg-primary/10 w-full text-left flex justify-between items-center"
                       >
                         Coming Soon <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isComingSoonDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
                       <AnimatePresence>
-                      {isComingSoonDropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="pl-4 mt-1 space-y-1"
-                        >
-                          {comingSoonNavProducts.map(product => (
-                            <Link key={product.id} to={`/product/${product.id}`} className="block text-foreground/80 hover:text-primary py-1.5 rounded-md hover:bg-primary/5 relative text-sm" onClick={() => {setIsComingSoonDropdownOpen(false); setIsMenuOpen(false);}}>
-                              {product.name.replace("Meenora ", "").replace(" SPF 50", "")}
-                              <Badge variant="secondary" className="ml-2 text-xs px-1 py-0.5 bg-accent/20 text-accent-foreground border-accent/50">Soon</Badge>
-                            </Link>
-                          ))}
-                        </motion.div>
-                      )}
+                        {isComingSoonDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="pl-4 mt-1 space-y-1"
+                          >
+                            {comingSoonNavProducts.map(product => (
+                              <Link key={product.id} to={`/product/${product.id}`} className="block text-foreground/80 hover:text-primary py-1.5 rounded-md hover:bg-primary/5 relative text-sm" onClick={() => { setIsComingSoonDropdownOpen(false); setIsMenuOpen(false); }}>
+                                {product.name.replace("Meenora ", "").replace(" SPF 50", "")}
+                                <Badge variant="secondary" className="ml-2 text-xs px-1 py-0.5 bg-accent/20 text-accent-foreground border-accent/50">Soon</Badge>
+                              </Link>
+                            ))}
+                          </motion.div>
+                        )}
                       </AnimatePresence>
                     </div>
                   ) : (
-                  <Link
-                    key={item.name}
-                    to={item.path}
-                    className="text-foreground/90 hover:text-primary transition-colors duration-200 font-medium text-base px-4 py-2.5 rounded-md hover:bg-primary/10"
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      if (item.onClick) item.onClick();
-                    }}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      className="text-foreground/90 hover:text-primary transition-colors duration-200 font-medium text-base px-4 py-2.5 rounded-md hover:bg-primary/10"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        if (item.onClick) item.onClick();
+                      }}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
                 <Button
                   variant="outline"
                   onClick={() => {
-                    handleAuthAction();
+                    handleLogout();
                     setIsMenuOpen(false);
                   }}
                   className="w-full mt-3 text-base py-2.5 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
