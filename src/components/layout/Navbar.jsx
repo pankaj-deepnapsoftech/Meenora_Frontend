@@ -79,7 +79,7 @@ const Navbar = () => {
       onMouseEnter={() => setIsComingSoonDropdownOpen(true)}
       onMouseLeave={() => setIsComingSoonDropdownOpen(false)}
     >
-      <button className="text-foreground/80 hover:text-primary transition-colors duration-200 font-medium text-[19px] flex items-center">
+      <button className="text-foreground/80 hover:text-primary transition-colors duration-200 font-medium text-[16px] flex items-center">
         Coming Soon <ChevronDown className={`ml-1 mt-1 h-4 w-4 transition-transform ${isComingSoonDropdownOpen ? 'rotate-180' : ''}`} />
       </button>
       <AnimatePresence>
@@ -114,30 +114,14 @@ const Navbar = () => {
     <nav className={`sticky top-0 z-50 transition-all duration-300  ${isScrolled ? 'backdrop-blur-md shadow-lg bg-[#dddddd83]' : 'border-b border-[#ffff] shadow-md bg-card/90'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center whitespace-nowrap h-24">
-          <Link to="/" className="flex items-center space-x-2">
-            <motion.span
-              className="font-display"
-              whileHover={{
-                scale: 1.05,
-                textShadow: "0px 0px 8px hsl(var(--primary))",
-              }}
-            >
-              <img
-                src="/Logo/Company_logo2.png"
-                alt="Company Logo"
-                className="object-contain w-64 h-auto"
-              />
-            </motion.span>
-          </Link>
-
-          <div className="hidden md:flex items-center space-x-7">
+          <div className="hidden md:flex items-center space-x-4">
             {navItemsBase.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.path}
                 onClick={item.onClick}
                 className={({ isActive }) =>
-                  `text-[18px] font-medium transition-colors duration-200 px-4 py-2 rounded-3xl
+                  `text-[15px] font-medium transition-colors  duration-200 px-4 py-2 rounded-3xl
               ${isActive ? 'bg-primary text-white px-6  ' : 'text-foreground/80 hover:text-primary'}`
                 }
               >
@@ -151,7 +135,7 @@ const Navbar = () => {
                 key={item.name}
                 to={item.path}
                 className={({ isActive }) =>
-                  `text-[18px] font-medium transition-colors duration-200 px-4 py-2 rounded-md
+                  `text-[15px] font-medium transition-colors duration-200 px-4 py-2 rounded-md
               ${isActive ? 'bg-primary text-white px-6  ' : 'text-foreground/80 hover:text-primary'}`
                 }
                 onClick={item.onClick}
@@ -160,6 +144,25 @@ const Navbar = () => {
               </NavLink>
             ))}
           </div>
+
+
+          <Link to="/" className="flex items-center space-x-2">
+            <motion.span
+              className="font-display"
+              whileHover={{
+                scale: 1.05,
+                textShadow: "0px 0px 8px hsl(var(--primary))",
+              }}
+            >
+              <img
+                src="/Logo/Company_logo2.png"
+                alt="Company Logo"
+                className="object-contain w-48 h-auto"
+              />
+            </motion.span>
+          </Link>
+
+         
 
           <div className="flex items-center space-x-2 sm:space-x-3">
             <Button

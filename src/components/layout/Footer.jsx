@@ -45,7 +45,7 @@ const Footer = () => {
               <img
                 src="/Logo/Company_logo2.png"
                 alt="Company Logo"
-                className="w-36 h-auto  object-contain"
+                className="w-42 h-auto  object-contain"
               />
             </Link>
 

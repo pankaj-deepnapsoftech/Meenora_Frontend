@@ -1,120 +1,176 @@
+import React, { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { ShoppingBag, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAdminBannerContext } from "../../contexts/AdminBannerContext";
 
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight, ShoppingBag, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAdminBannerContext } from '../../contexts/AdminBannerContext';
+// Slide animation variants
+const slideVariants = {
+  enter: (direction) => ({
+    x: direction > 0 ? 2000 : -1000,
+  }),
+  center: {
+    x: 0,
+  },
+  exit: (direction) => ({
+    x: direction < 0 ? 2000 : -1000,
+  }),
+};
 
 const HeroSection = () => {
-  const { bannerDataBypage, GetBannerDataByPage } = useAdminBannerContext()
+  const { bannerDataBypage, GetBannerDataByPage } = useAdminBannerContext();
+  const banners = bannerDataBypage?.home || [];
 
-  const bannerData = bannerDataBypage?.home?.[0] ;
+  const [page, setPage] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const intervalRef = useRef(null);
 
-  useEffect(()=>{
-    GetBannerDataByPage('home')
+  const imageIndex = page % banners.length;
 
-  },[])
+  useEffect(() => {
+    GetBannerDataByPage("home");
+  }, []);
 
+  // Auto-slide every 2s
+  useEffect(() => {
+    if (banners.length === 0) return;
+
+    const startAutoSlide = () => {
+      intervalRef.current = setInterval(() => {
+        setPage((prev) => (prev + 1) % banners.length);
+        setDirection(1);
+      }, 3000);
+    };
+
+    startAutoSlide();
+
+    return () => clearInterval(intervalRef.current);
+  }, [banners.length]);
+
+  const goToSlide = (i) => {
+    setDirection(i > page ? 1 : -1);
+    setPage(i);
+  };
 
   return (
-    <section className="bg-gradient-to-br from-background via-primary/5 to-background min-h-[calc(100vh-80px)] flex items-center relative overflow-hidden">
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-br from-primary/10 via-transparent to-transparent filter blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-1/2 h-full bg-gradient-to-tl from-accent/10 via-transparent to-transparent filter blur-3xl"></div>
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -80 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
-            className="space-y-8 text-center lg:text-left"
-          >
-            {/* Optional Subheading */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-primary font-semibold tracking-wider uppercase text-sm"
-            >
-              Meenora Professional
-            </motion.p>
+    <section className="relative min-h-[calc(100vh-80px)] bg-background w-full">
+      {/* Slider Section */}
+      <div className="w-full mt-8 h-[60vh] sm:h-[75vh] lg:h-[55vh] px-4 flex flex-col items-center">
+        <div className="w-full h-full rounded-xl overflow-hidden shadow-lg relative">
+          <AnimatePresence initial={false} custom={direction}>
+            {banners.length > 0 && (
+              <motion.img
+                key={banners[imageIndex]?.image}
+                src={banners[imageIndex]?.image || "/fallback.jpg"}
+                alt={banners[imageIndex]?.heading || "Meenora Product"}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ ease: "easeInOut", duration: 0.6 }}
+                className="absolute inset-0 w-full h-full object-cover object-center rounded-xl"
+              />
+            )}
+          </AnimatePresence>
+        </div>
 
-            {/* Heading from Banner */}
+        {/* Dots */}
+        <div className="flex mt-4 space-x-3">
+          {banners.map((_, i) => (
+            <button
+              key={i}
+              className={`w-3 h-3 rounded-full transition-colors duration-300 ${i === imageIndex ? "bg-primary" : "bg-gray-300"}`}
+              onClick={() => goToSlide(i)}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="relative z-10 max-w-7xl mx-4 sm:px-6 lg:px-8 py-12 lg:py-20 text-center">
+        {banners.length > 0 && (
+          <>
             <motion.h1
+              key={banners[imageIndex]?.heading}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
-              className="text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-foreground leading-tight tracking-tight"
+              transition={{ duration: 0.9, delay: 0.2 }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight"
             >
-              {bannerData?.heading || "Because Self-Care Should Be"}
-             
+              {banners[imageIndex]?.heading || "Because Self-Care Should Be"}
             </motion.h1>
-          
-            <motion.h1
+
+            <motion.h2
+              key={banners[imageIndex]?.description}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
-              className="text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-foreground leading-tight tracking-tight"
+              transition={{ duration: 0.9, delay: 0.3 }}
+              className="text-xl sm:text-2xl font-display text-foreground mt-4"
             >
-              {bannerData?.description || "Because Self-Care Should Be"}
-              <span className="block gradient-text mt-2 lg:mt-3">
+              <span className="block gradient-text">
                 Simple, Clean, and Empowering.
               </span>
-            </motion.h1>
-            {/* Description */}
+            </motion.h2>
+
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.4, ease: "easeOut" }}
-              className="text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0"
+              transition={{ duration: 0.9, delay: 0.4 }}
+              className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mt-4"
             >
-              {bannerData?.description || "Discover sulfate-free, cruelty-free, and vegan personal care that works with your body — not against it."}
+              Discover sulfate-free, cruelty-free, and vegan personal care that works with your body — not against it.
             </motion.p>
 
-            {/* Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.6, ease: "easeOut" }}
-              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+              transition={{ duration: 0.9, delay: 0.6 }}
+              className="flex flex-col sm:flex-row gap-4 mt-8 justify-center"
             >
               <Link to="/shop">
-                <Button size="lg" className="btn-primary text-base py-3.5 px-8 group w-full sm:w-auto shadow-lg">
+                <Button size="lg" className="btn-primary text-base py-3.5 px-8 group shadow-lg">
                   Shop Now
                   <ShoppingBag className="ml-2.5 h-5 w-5 group-hover:animate-pulse" />
                 </Button>
               </Link>
               <Link to="/shop#coming-soon">
-                <Button variant="outline" size="lg" className="text-base py-3.5 px-8 border-secondary text-secondary hover:bg-secondary hover:text-white w-full sm:w-auto shadow-sm">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-base py-3.5 px-8 border-secondary text-secondary hover:bg-secondary hover:text-white shadow-sm"
+                >
                   Explore Coming Soon
-                  <Sparkles className="ml-2.5 h-5 w-5 group-hover:animate-ping transition-transform" />
+                  <Sparkles className="ml-2.5 h-5 w-5 group-hover:animate-ping" />
                 </Button>
               </Link>
             </motion.div>
-          </motion.div>
-
-          {/* Right Image */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.3 }}
-            className="relative group flex justify-center"
-          >
-            <div className="relative z-10 p-3 bg-card/50 backdrop-blur-md rounded-2xl shadow-2xl max-w-md w-full">
-              <img
-                src={bannerData?.image || "/fallback.jpg"}
-                className="w-full h-auto rounded-xl object-cover "
-                alt={bannerData?.heading || "Meenora Product"}
-              />
-            </div>
-            <div className="absolute -inset-3 bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-80 transition-opacity duration-500 animate-pulse-slow"></div>
-          </motion.div>
-        </div>
-
+          </>
+        )}
       </div>
+      <div className="relative z-10 px-6 py-12 lg:py-20 text-center bg-white">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display text-zinc-700 leading-tight mb-6">
+          Introducing Our Shampoo
+          <span className="block text-zinc-500 text-xl md:text-2xl font-medium mt-2">
+            Tested Purity. Visible Strength.
+          </span>
+        </h1>
+
+        <div className="w-full  rounded-2xl overflow-hidden shadow-xl">
+          <video
+            src="/MEENORA.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-auto object-cover"
+            title="Product Demo Video"
+          />
+        </div>
+      </div>
+
     </section>
   );
 };

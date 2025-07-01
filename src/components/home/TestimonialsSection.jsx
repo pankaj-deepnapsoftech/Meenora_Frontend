@@ -1,89 +1,114 @@
-
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Star, Quote } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useRef } from 'react';
+import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const testimonialsData = [
   {
     name: "Ananya M.",
     rating: 5,
-    comment: "I’ve never felt more confident about my hair. Meenora actually delivers what it promises.",
-    image: "Joyful woman with healthy, flowing dark hair, smiling broadly",
-    title: "Confidence Restored!"
+    comment: "Confidence restored!",
+    video: "/reviewVideo/Video-800.mp4",
   },
   {
     name: "Ravi S.",
     rating: 5,
-    comment: "The clean ingredients give me peace of mind, and the results are real.",
-    image: "Man looking pleased, inspecting his healthy hair or skin",
-    title: "Peace of Mind & Real Results"
+    comment: "Real results.",
+    video: "/reviewVideo/Video-377.mp4",
   },
-  { // Adding a third generic one if needed, or could use one from previous set
+  {
     name: "Priya K.",
     rating: 5,
-    comment: "Finally, products that understand my needs! My skin feels amazing and hair is healthier than ever.",
-    image: "Woman with glowing skin, happily touching her face",
-    title: "Understands My Needs!"
-  }
+    comment: "Feels amazing.",
+    video: "/reviewVideo/Video-76.mp4",
+  },
+  {
+    name: "Priya K.",
+    rating: 5,
+    comment: "Feels amazing.",
+    video: "/reviewVideo/AQPbSlAlYpfaXmNni854DU-XGNsbbjPMqyv77te24-9YYLxktlvvJrDnoyDV-0Lh8VVLPetnFRLOX3_ofR3DoVFtLrMsrko0853A7rE.mp4",
+  },
+  {
+    name: "Priya K.",
+    rating: 5,
+    comment: "Feels amazing.",
+    video: "/reviewVideo/AQM9xr6unDjRWHOXD7EkAc1mxN8ZgeE1wFOXQ7D_C6vBFZy1dEV_jecvSZj0wu7_CCxaV88gYIsqyl8kLjYA6vkVWzeGJTHkgWTG4WU.mp4",
+  },
 ];
 
-
 const TestimonialsSection = () => {
-  return (
-    <section className="py-20 lg:py-28 bg-background"> {/* Changed to bg-background for contrast */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-16 lg:mb-20"
-        >
-          <Quote className="h-12 w-12 text-primary/50 mx-auto mb-4" />
-          <h2 className="text-4xl lg:text-5xl font-display font-bold text-foreground mb-5">
-            Loved by You
-          </h2>
-          <p className="text-lg lg:text-xl text-muted-foreground">
-            Hear what our cherished customers are saying about their Meenora experience.
-          </p>
-        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-          {testimonialsData.map((testimonial, index) => (
-            <motion.div
-              key={testimonial.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.8, delay: index * 0.15 }}
-            >
-              <Card className="testimonial-card p-8 h-full bg-card border-border/70 shadow-xl hover:shadow-secondary/20 flex flex-col">
-                <CardContent className="space-y-5 flex flex-col flex-grow">
-                  <div className="flex items-center space-x-1 text-primary">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 fill-current" />
-                    ))}
-                  </div>
-                  <h4 className="text-xl font-semibold text-foreground pt-1">{testimonial.title}</h4>
-                  <p className="text-foreground/85 italic text-base leading-relaxed flex-grow">"{testimonial.comment}"</p>
-                  <div className="flex items-center space-x-4 pt-5 border-t border-border/50 mt-auto">
-                    <img  
-                      className="w-14 h-14 rounded-full object-cover ring-2 ring-primary/50"
-                      alt={testimonial.image}
-                     src="https://images.unsplash.com/photo-1595872018818-97555653a011" />
-                    <div>
-                      <p className="font-semibold text-foreground text-lg">{testimonial.name}</p>
-                      <p className="text-sm text-muted-foreground">Verified Buyer</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+
+  const scrollRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = 400;
+      scrollRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  return (
+    <section className="bg-secondary/20 py-20 px-6">
+      <div className="max-w-7xl mx-auto relative">
+      
+        <Quote className="h-12 w-12 text-foreground/50 mb-8 mx-auto" />
+        <h1 className="text-zinc-700 font-display text-[50px] font-bold text-center mb-4">
+          How to Use These Products
+        </h1>
+        <p className="text-center text-lg text-black/60 mb-10">
+          These videos show how to use our products effectively.
+        </p>
+
+       
+        <div className="relative">
+      
+          <button
+            onClick={() => scroll("left")}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white text-black p-2 rounded-full shadow"
+          >
+            <ChevronLeft />
+          </button>
+
+    
+          <button
+            onClick={() => scroll("right")}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/70 hover:bg-white text-black p-2 rounded-full shadow"
+          >
+            <ChevronRight />
+          </button>
+
+        
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto scroll-smooth scrollbar-hide flex-nowrap gap-x-6 pb-4 px-6"
+          >
+            {testimonialsData.map((testimonial, index) => (
+              <div
+                key={index}
+                className="w-[330px] bg-white/5 border border-gray-300 rounded-xl p-4 shadow-lg flex-shrink-0"
+              >
+                <div className="relative w-[300px] h-[60vh] aspect-video mb-4 overflow-hidden rounded-lg">
+                  <video
+                    src={testimonial.video}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="w-full h-full object-cover"
+                    title={`Testimonial from ${testimonial.name}`}
+                  >
+                    <track kind="captions" />
+                  </video>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
+
   );
 };
 

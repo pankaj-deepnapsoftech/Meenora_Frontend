@@ -40,7 +40,7 @@ const Shop = () => {
 
   const allDisplayCategories = Array.from(new Set([
     ...preferredCategories,
-    ...dynamicCategories
+   
   ]));
 
   const shopCategories = allDisplayCategories.map((name) => ({
